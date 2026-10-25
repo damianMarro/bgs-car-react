@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { Navbar } from './components/Navbar';
 import { FleetPage } from './pages/FleetPage';
-import { CartPage } from './pages/CartPage'; // Importamos la nueva pagina
+import { CartPage } from './pages/CartPage'; 
+import { AdminPage } from './pages/AdminPage';
 
 export default function App() {
   return (
@@ -14,8 +15,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<FleetPage />} /> 
             <Route path="/flota" element={<FleetPage />} />
-            {/* Agregamos la ruta del carrito */}
             <Route path="/carrito" element={<CartPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </main>
       </BrowserRouter>

@@ -16,6 +16,9 @@ export function Navbar() {
           <li className="nav-item">
             <Link className="nav-link" to="/flota">Flota</Link>
           </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/admin">Admin</Link>
+          </li>
         </ul>
         
         <Link to="/carrito" className="btn btn-outline-light position-relative">

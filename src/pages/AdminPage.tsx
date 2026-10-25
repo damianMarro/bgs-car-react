@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { vehicles as initialVehicles } from '../data/vehicles';
-import { Vehicle } from '../types';
+import type { Vehicle } from '../types';
 import { formatCLP } from '../utils';
 
 export function AdminPage() {

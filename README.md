@@ -1,75 +1,30 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Project Title
 
-Currently, two official plugins are available:
+A brief description of what this project does and who it's for
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Descripcion
+Este proyecto es una migracion de una aplicacion web de renta de vehiculos (originalmente desarrollada en Vanilla JS, HTML y CSS) hacia una arquitectura moderna de componentes usando React, TypeScript y Vite.
 
-## React Compiler
+El objetivo principal es demostrar la transicion de la manipulacion directa del DOM a un modelo de estado reactivo, predecible y tipado estrictamente.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+**Client:** React 18, TypeScript, Vite, React Router DOM, Bootstrap 5.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Caracteristicas
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Catalogo de vehiculos (Flota) con tarjetas reutilizables.
+- Carrito de compras global manejado con React Context API.
+- Persistencia de datos del carrito en el almacenamiento local (`localStorage`).
+- Calculo de totales y subtotales derivados del estado.
+- Panel de administracion basico (CRUD local de vehiculos).
+- Navegacion SPA (Single Page Application) sin recargas de pagina.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Instalacion
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Para ejecutar este proyecto de forma local, sigue estos pasos:
 
-```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+1. Clona el repositorio:
+```bash
+  git clone https://github.com/TU_USUARIO/bgs-car-react.git

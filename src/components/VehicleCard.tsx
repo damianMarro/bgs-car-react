@@ -1,4 +1,4 @@
-import { Vehicle } from '../types';
+import type { Vehicle } from '../types';
 import { formatCLP } from '../utils';
 
 interface VehicleCardProps {

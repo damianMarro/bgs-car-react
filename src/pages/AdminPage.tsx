@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { vehicles as initialVehicles } from '../data/vehicles';
 import type { Vehicle } from '../types';
 import { formatCLP } from '../utils';
+import { useFleet } from '../hooks/useFleet';
 
 export function AdminPage() {
-  const [fleet, setFleet] = useState<Vehicle[]>(initialVehicles);
+  // Usamos el estado global
+  const { fleet, addVehicle, deleteVehicle } = useFleet();
+
   const [formData, setFormData] = useState({
     marca: '',
     modelo: '',
@@ -13,7 +15,6 @@ export function AdminPage() {
     precioDia: 0,
   });
 
-  // Manejador de cambios en los inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -22,27 +23,21 @@ export function AdminPage() {
     }));
   };
 
-  // Manejador del envio del formulario
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validacion basica
     if (!formData.marca || !formData.modelo || formData.precioDia <= 0) {
       alert('Por favor, completa todos los campos correctamente.');
       return;
     }
 
-    // Creamos el nuevo vehiculo generando un ID con la fecha actual
     const newVehicle: Vehicle = {
       ...formData,
       id: Date.now(), 
-      imagen: '/placeholder.jpg', // Imagen por defecto
+      imagen: '/placeholder.jpg', 
     };
 
-    // Inmutabilidad: creamos un nuevo arreglo con el nuevo vehiculo
-    setFleet((prev) => [...prev, newVehicle]);
+    addVehicle(newVehicle); // Usamos la funcion del contexto
     
-    // Limpiamos el formulario
     setFormData({
       marca: '',
       modelo: '',
@@ -54,20 +49,16 @@ export function AdminPage() {
     alert('Vehiculo agregado exitosamente');
   };
 
-  // Manejador para eliminar un vehiculo
   const handleDelete = (id: number) => {
-    // Confirmacion antes de eliminar
     if (window.confirm('¿Estas seguro de eliminar este vehiculo?')) {
-      setFleet((prev) => prev.filter((v) => v.id !== id));
+      deleteVehicle(id); // Usamos la funcion del contexto
     }
   };
 
   return (
     <div className="container py-5">
       <h2 className="mb-4 fw-bold">Panel de Administrador</h2>
-
       <div className="row">
-        {/* Columna izquierda: Formulario */}
         <div className="col-md-4 mb-4">
           <div className="card shadow-sm">
             <div className="card-header bg-dark text-white">
@@ -77,23 +68,11 @@ export function AdminPage() {
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">Marca</label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    name="marca" 
-                    value={formData.marca} 
-                    onChange={handleChange} 
-                  />
+                  <input type="text" className="form-control" name="marca" value={formData.marca} onChange={handleChange} />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Modelo</label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    name="modelo" 
-                    value={formData.modelo} 
-                    onChange={handleChange} 
-                  />
+                  <input type="text" className="form-control" name="modelo" value={formData.modelo} onChange={handleChange} />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Categoria</label>
@@ -106,23 +85,14 @@ export function AdminPage() {
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Precio por Dia</label>
-                  <input 
-                    type="number" 
-                    className="form-control" 
-                    name="precioDia" 
-                    value={formData.precioDia || ''} 
-                    onChange={handleChange} 
-                  />
+                  <input type="number" className="form-control" name="precioDia" value={formData.precioDia || ''} onChange={handleChange} />
                 </div>
-                <button type="submit" className="btn btn-primary w-100">
-                  Guardar Vehiculo
-                </button>
+                <button type="submit" className="btn btn-primary w-100">Guardar Vehiculo</button>
               </form>
             </div>
           </div>
         </div>
 
-        {/* Columna derecha: Tabla de vehiculos */}
         <div className="col-md-8">
           <div className="table-responsive shadow-sm rounded">
             <table className="table table-hover align-middle bg-white mb-0">
@@ -145,12 +115,7 @@ export function AdminPage() {
                     </td>
                     <td>{formatCLP(vehicle.precioDia)}</td>
                     <td>
-                      <button 
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDelete(vehicle.id)}
-                      >
-                        Eliminar
-                      </button>
+                      <button className="btn btn-sm btn-danger" onClick={() => handleDelete(vehicle.id)}>Eliminar</button>
                     </td>
                   </tr>
                 ))}

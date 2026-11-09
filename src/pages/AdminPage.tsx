@@ -1,164 +1,44 @@
 import { useState } from 'react';
-import { vehicles as initialVehicles } from '../data/vehicles';
+import type { FormEvent } from 'react';
+import { AdminFleetTable, AdminVehicleForm } from '../components/admin/AdminFleet';
+import { validateVehicleInput } from '../data/vehicles';
+import { useFleet } from '../hooks/useFleet';
 import type { Vehicle } from '../types';
-import { formatCLP } from '../utils';
+
+const blankForm = { marca: '', modelo: '', categoria: 'sedan' as Vehicle['categoria'], transmision: 'Automático' as Vehicle['transmision'], precioDia: 0, imagen: '/assets/img/camry.png' };
+type VehicleForm = Omit<Vehicle, 'id'>;
 
 export function AdminPage() {
-  const [fleet, setFleet] = useState<Vehicle[]>(initialVehicles);
-  const [formData, setFormData] = useState({
-    marca: '',
-    modelo: '',
-    categoria: 'sedan' as Vehicle['categoria'],
-    transmision: 'Automático' as Vehicle['transmision'],
-    precioDia: 0,
-  });
-
-  // Manejador de cambios en los inputs
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'precioDia' ? Number(value) : value,
-    }));
+  const { fleet, addVehicle, updateVehicle, removeVehicle } = useFleet();
+  const [form, setForm] = useState<VehicleForm>(blankForm);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [notice, setNotice] = useState('');
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const validationErrors = validateVehicleInput(form);
+    if (validationErrors.length) { setNotice(validationErrors.join(' ')); return; }
+    const vehicleData = { ...form, marca: form.marca.trim(), modelo: form.modelo.trim() };
+    if (editingId === null) { addVehicle(vehicleData); setNotice('El vehículo se agregó a la flota.'); }
+    else { updateVehicle({ ...vehicleData, id: editingId }); setNotice('Los cambios del vehículo se guardaron.'); }
+    setForm(blankForm); setEditingId(null);
   };
-
-  // Manejador del envio del formulario
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validacion basica
-    if (!formData.marca || !formData.modelo || formData.precioDia <= 0) {
-      alert('Por favor, completa todos los campos correctamente.');
-      return;
-    }
-
-    // Creamos el nuevo vehiculo generando un ID con la fecha actual
-    const newVehicle: Vehicle = {
-      ...formData,
-      id: Date.now(), 
-      imagen: '/placeholder.jpg', // Imagen por defecto
-    };
-
-    // Inmutabilidad: creamos un nuevo arreglo con el nuevo vehiculo
-    setFleet((prev) => [...prev, newVehicle]);
-    
-    // Limpiamos el formulario
-    setFormData({
-      marca: '',
-      modelo: '',
-      categoria: 'sedan',
-      transmision: 'Automatico',
-      precioDia: 0,
-    });
-    
-    alert('Vehiculo agregado exitosamente');
-  };
-
-  // Manejador para eliminar un vehiculo
-  const handleDelete = (id: number) => {
-    // Confirmacion antes de eliminar
-    if (window.confirm('¿Estas seguro de eliminar este vehiculo?')) {
-      setFleet((prev) => prev.filter((v) => v.id !== id));
+  const deleteVehicle = (vehicle: Vehicle) => {
+    if (window.confirm(`¿Eliminar ${vehicle.marca} ${vehicle.modelo} de la flota?`)) {
+      removeVehicle(vehicle.id);
+      if (editingId === vehicle.id) { setEditingId(null); setForm(blankForm); }
     }
   };
+  const editVehicle = (vehicle: Vehicle) => {
+    setEditingId(vehicle.id);
+    setForm({ marca: vehicle.marca, modelo: vehicle.modelo, categoria: vehicle.categoria, transmision: vehicle.transmision, precioDia: vehicle.precioDia, imagen: vehicle.imagen });
+    setNotice(`Editando ${vehicle.marca} ${vehicle.modelo}.`);
+  };
+  const changeField = (field: keyof VehicleForm, value: string | number) => setForm((current) => ({ ...current, [field]: value }) as VehicleForm);
+  const cancelEdit = () => { setEditingId(null); setForm(blankForm); setNotice('Edición cancelada.'); };
 
-  return (
-    <div className="container py-5">
-      <h2 className="mb-4 fw-bold">Panel de Administrador</h2>
-
-      <div className="row">
-        {/* Columna izquierda: Formulario */}
-        <div className="col-md-4 mb-4">
-          <div className="card shadow-sm">
-            <div className="card-header bg-dark text-white">
-              <h5 className="mb-0">Agregar Vehiculo</h5>
-            </div>
-            <div className="card-body">
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label className="form-label">Marca</label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    name="marca" 
-                    value={formData.marca} 
-                    onChange={handleChange} 
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Modelo</label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    name="modelo" 
-                    value={formData.modelo} 
-                    onChange={handleChange} 
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Categoria</label>
-                  <select className="form-select" name="categoria" value={formData.categoria} onChange={handleChange}>
-                    <option value="sedan">Sedan</option>
-                    <option value="suv">SUV</option>
-                    <option value="deportivo">Deportivo</option>
-                    <option value="camioneta">Camioneta</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Precio por Dia</label>
-                  <input 
-                    type="number" 
-                    className="form-control" 
-                    name="precioDia" 
-                    value={formData.precioDia || ''} 
-                    onChange={handleChange} 
-                  />
-                </div>
-                <button type="submit" className="btn btn-primary w-100">
-                  Guardar Vehiculo
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        {/* Columna derecha: Tabla de vehiculos */}
-        <div className="col-md-8">
-          <div className="table-responsive shadow-sm rounded">
-            <table className="table table-hover align-middle bg-white mb-0">
-              <thead className="table-dark">
-                <tr>
-                  <th>ID</th>
-                  <th>Vehiculo</th>
-                  <th>Precio / Dia</th>
-                  <th>Accion</th>
-                </tr>
-              </thead>
-              <tbody>
-                {fleet.map((vehicle) => (
-                  <tr key={vehicle.id}>
-                    <td>{vehicle.id}</td>
-                    <td>
-                      <strong>{vehicle.marca} {vehicle.modelo}</strong>
-                      <br />
-                      <small className="text-muted text-capitalize">{vehicle.categoria}</small>
-                    </td>
-                    <td>{formatCLP(vehicle.precioDia)}</td>
-                    <td>
-                      <button 
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDelete(vehicle.id)}
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <main className="container-fluid admin-page py-4 px-3 px-lg-4 flex-grow-1">
+    <header className="admin-heading bg-black border border-danger rounded-3 p-4 mb-4 d-flex flex-column flex-sm-row justify-content-between gap-2"><div><p className="eyebrow text-danger mb-2">BGS CAR · ADMINISTRACIÓN</p><h1 className="h2 mb-0">Panel de control</h1></div><span className="badge bg-secondary align-self-sm-center">{fleet.length} vehículos</span></header>
+    {notice && <div className="alert alert-info" role="status">{notice}</div>}
+    <div className="row g-4"><AdminVehicleForm form={form} editing={editingId !== null} onChange={changeField} onSubmit={submit} onCancel={cancelEdit} /><AdminFleetTable vehicles={fleet} onEdit={editVehicle} onDelete={deleteVehicle} /></div>
+  </main>;
 }

@@ -1,56 +1,64 @@
-// src/context/CartContext.tsx
-import { createContext, useState, useEffect, ReactNode } from 'react';
-import { Vehicle, CartItem } from '../types';
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { CartContext } from './cart-store';
+import type { CartItem, Vehicle } from '../types';
 
-interface CartContextType {
-  cart: CartItem[];
-  addToCart: (vehicle: Vehicle, dias: number) => void;
-  removeFromCart: (id: number) => void;
-  clearCart: () => void;
-  totalPrice: number;
+const CART_KEY = 'bgs_carrito';
+const DAYS_KEY = 'bgs_dias_reserva';
+
+function normalizeImagePath(image: string) {
+  return image.startsWith('/') ? image : `/${image.replace(/^\.\//, '')}`;
 }
 
-// Creamos el contexto vacio
-export const CartContext = createContext<CartContextType | undefined>(undefined);
+function readCart(): CartItem[] {
+  try {
+    const stored = localStorage.getItem(CART_KEY);
+    if (!stored) return [];
+    const items = JSON.parse(stored) as Array<CartItem & { cantidad?: number }>;
+    return items.map((item) => ({
+      ...item,
+      dias: item.dias ?? item.cantidad ?? 1,
+      imagen: normalizeImagePath(item.imagen),
+      transmision: item.transmision === 'Manual' ? 'Manual' : 'Automático',
+    }));
+  } catch {
+    return [];
+  }
+}
 
-// Componente proveedor que envuelve la aplicacion
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    // Inicializacion perezosa desde localStorage
-    const saved = localStorage.getItem('bgs_cart');
-    return saved ? JSON.parse(saved) : [];
+  const [cart, setCart] = useState<CartItem[]>(readCart);
+  const [rentalDays, setRentalDaysState] = useState(() => {
+    const days = Number(localStorage.getItem(DAYS_KEY));
+    return Number.isInteger(days) && days > 0 ? days : 1;
   });
 
-  // Sincronizacion con localStorage
   useEffect(() => {
-    localStorage.setItem('bgs_cart', JSON.stringify(cart));
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (vehicle: Vehicle, dias: number) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === vehicle.id);
-      if (existing) {
-        // Si ya existe, sumamos los dias
-        return prev.map((item) =>
-          item.id === vehicle.id ? { ...item, dias: item.dias + dias } : item
-        );
+  const setRentalDays = (days: number) => {
+    const safeDays = Number.isInteger(days) && days > 0 ? days : 1;
+    setRentalDaysState(safeDays);
+    localStorage.setItem(DAYS_KEY, String(safeDays));
+  };
+
+  const addToCart = (vehicle: Vehicle) => {
+    setCart((current) => {
+      const found = current.some((item) => item.id === vehicle.id);
+      if (found) {
+        return current.map((item) => item.id === vehicle.id ? { ...item, dias: rentalDays } : item);
       }
-      // Si no existe, lo agregamos
-      return [...prev, { ...vehicle, dias }];
+      return [...current, { ...vehicle, dias: rentalDays }];
     });
   };
 
-  const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
-
+  const removeFromCart = (id: number) => setCart((current) => current.filter((item) => item.id !== id));
   const clearCart = () => setCart([]);
-
-  // Calculo derivado (no es un estado, se calcula en el render)
-  const totalPrice = cart.reduce((acc, item) => acc + item.precioDia * item.dias, 0);
+  const totalPrice = cart.reduce((sum, item) => sum + item.precioDia * item.dias, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, totalPrice }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, totalPrice, rentalDays, setRentalDays }}>
       {children}
     </CartContext.Provider>
   );

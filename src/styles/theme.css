@@ -1,0 +1,114 @@
+:root {
+  color-scheme: dark;
+  --bgs-orange: #ff5e00;
+  --bgs-orange-hover: #cf4c00;
+  --bgs-background: #171717;
+  --bgs-panel: #080808;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bgs-background);
+  color: #f8f9fa;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.text-bgs { color: var(--bgs-orange) !important; }
+.bg-bgs { background-color: var(--bgs-orange) !important; }
+.border-bgs { border-color: var(--bgs-orange) !important; }
+
+.btn-bgs {
+  background: var(--bgs-orange);
+  border-color: var(--bgs-orange);
+  color: #fff;
+}
+.btn-bgs:hover,
+.btn-bgs:focus-visible {
+  background: var(--bgs-orange-hover);
+  border-color: var(--bgs-orange-hover);
+  color: #fff;
+}
+.btn-outline-bgs {
+  color: var(--bgs-orange);
+  border-color: var(--bgs-orange);
+}
+.btn-outline-bgs:hover,
+.btn-outline-bgs:focus-visible {
+  background: var(--bgs-orange);
+  color: #fff;
+}
+
+.logo-bgs { height: 54px; width: auto; object-fit: contain; }
+.navbar { min-height: 76px; }
+.navbar-nav .nav-link { padding-inline: .75rem; }
+.eyebrow { color: var(--bgs-orange); font-size: .72rem; font-weight: 800; letter-spacing: .16em; }
+.page-heading h1 { font-weight: 750; letter-spacing: -.035em; }
+.py-lg-6 { padding-top: 5rem !important; padding-bottom: 5rem !important; }
+
+.hero-section {
+  min-height: 570px;
+  background:
+    linear-gradient(90deg, rgba(5, 5, 5, .92), rgba(5, 5, 5, .64)),
+    url('/assets/img/tesla.png') center 55% / cover;
+}
+.hero-section h1 { letter-spacing: -.045em; }
+.booking-form {
+  max-width: 1060px;
+  padding: 1.4rem;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 1rem;
+  background: rgba(5, 5, 5, .84);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, .25);
+  backdrop-filter: blur(8px);
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--bgs-orange);
+  box-shadow: 0 0 0 .2rem rgba(255, 94, 0, .2);
+}
+.form-check-input:checked { background-color: var(--bgs-orange); border-color: var(--bgs-orange); }
+
+.vehicle-card { overflow: hidden; transition: transform .18s ease, border-color .18s ease; }
+.vehicle-card:hover { transform: translateY(-3px); border-color: var(--bgs-orange) !important; }
+.vehicle-image { height: 205px; object-fit: cover; background: #252525; }
+.vehicle-detail-image { max-height: 520px; object-fit: cover; background: #252525; }
+.vehicle-specs { border-top: 1px solid #343a40; border-bottom: 1px solid #343a40; padding-block: 1rem; }
+.vehicle-specs dt, .vehicle-specs dd { margin-bottom: .75rem; }
+.vehicle-specs dt:last-of-type, .vehicle-specs dd:last-of-type { margin-bottom: 0; }
+.benefits-section { background: #f3f3f3; color: #171717; }
+.benefits-section .text-white-50 { color: #686868 !important; }
+.benefit-card { background: #fff; border: 1px solid #e6e6e6; }
+.benefit-mark { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border-radius: 50%; background: var(--bgs-orange); color: white; font-size: 1.3rem; }
+.service-number { color: var(--bgs-orange); font-size: .8rem; font-weight: 800; letter-spacing: .12em; }
+.empty-state { border: 1px solid #343a40; background: var(--bgs-panel); }
+.summary-card { position: sticky; top: 1.5rem; }
+.cart-thumb { width: 76px; height: 52px; object-fit: cover; }
+.admin-thumb { width: 58px; height: 40px; object-fit: cover; }
+.login-card { width: min(100%, 610px); }
+.site-footer a { color: #d6d6d6; text-decoration: none; }
+.site-footer a:hover { color: var(--bgs-orange); }
+.footer-brand { color: var(--bgs-orange) !important; font-weight: 800; font-size: 1.1rem; }
+
+@media (max-width: 991.98px) {
+  .navbar-collapse { padding: .75rem 0 1rem; }
+  .navbar-nav { align-items: stretch !important; }
+  .navbar-nav .nav-link { padding-block: .6rem; }
+  .hero-section { min-height: 620px; }
+}
+
+@media (max-width: 575.98px) {
+  .hero-section h1 { font-size: 2.6rem; }
+  .booking-form { padding: 1rem; }
+  .page-heading h1 { font-size: 2rem; }
+}
